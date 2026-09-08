@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -34,7 +34,7 @@ def chat(
     # ==========================
     # 1. 调用 RAG
     # ==========================
-    cache_key = f"chat:{body.question}"
+    cache_key = f"chat:{username}:{body.question}"
 
     cached_answer = redis_client.get(cache_key)
 
@@ -63,12 +63,6 @@ def chat(
     # 3. 确保 answer 是字符串
     # ==========================
     answer = str(answer)
-
-    print("========== DEBUG ==========")
-    print("answer =", repr(answer))
-    print("answer type =", type(answer))
-    print("sources =", repr(sources))
-    print("============================")
 
     # ==========================
     # 4. 查询用户
@@ -121,7 +115,10 @@ def delete_chat(
     )
 
     if user is None:
-        raise Exception("User not found")
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
     # 只查询属于当前用户的聊天记录
     message = (
@@ -134,9 +131,10 @@ def delete_chat(
     )
 
     if message is None:
-        return {
-            "message": "Chat message not found"
-        }
+        raise HTTPException(
+            status_code=404,
+            detail="Chat message not found"
+        )
 
     # 删除聊天记录
     db.delete(message)
@@ -172,7 +170,10 @@ def chat_history(
     )
 
     if user is None:
-        raise Exception("User not found")
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
 
     # 查询当前用户的聊天记录
     query = (

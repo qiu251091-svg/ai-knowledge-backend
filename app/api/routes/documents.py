@@ -3,7 +3,8 @@ from pypdf import PdfReader
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from app.services.auth_service import require_user
 from qdrant_client.models import (
     PointStruct,
     Filter,
@@ -57,7 +58,8 @@ def split_text(
 
 @router.post("/upload")
 async def upload_document(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    _username: str = Depends(require_user),
 ):
     filename = file.filename or ""
     suffix = Path(filename).suffix.lower()
@@ -161,7 +163,9 @@ async def upload_document(
         "indexed_count": len(points),
     }
 @router.get("")
-def list_documents():
+def list_documents(
+    _username: str = Depends(require_user),
+):
     documents = set()
 
     offset = None
@@ -192,7 +196,10 @@ def list_documents():
         "total": len(documents),
     }
 @router.delete("/{filename}")
-def delete_document(filename: str):
+def delete_document(
+    filename: str,
+    _username: str = Depends(require_user),
+):
     # 删除 Qdrant 中该文档对应的所有向量
     client.delete(
         collection_name=COLLECTION_NAME,
