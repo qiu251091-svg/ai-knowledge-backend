@@ -1,0 +1,31 @@
+RAG
+RAG 是 Retrieval-Augmented Generation，即检索增强生成。
+它会先从知识库中检索与用户问题相关的内容，再把这些内容交给大语言模型生成回答。
+
+FastAPI
+FastAPI 是一个 Python Web 框架，适合构建高性能 REST API。
+本项目使用 FastAPI 提供用户注册、登录、聊天和历史记录等后端接口。
+
+Redis
+Redis 是一种内存数据库。
+本项目中 Redis 主要用于缓存聊天问题的回答，减少重复调用 RAG 和大语言模型，提高响应速度。
+
+MySQL
+MySQL 是关系型数据库。
+本项目使用 MySQL 保存用户信息、聊天问题、回答内容和创建时间等持久化数据。
+
+JWT
+JWT 是一种常见的身份认证机制。
+本项目在用户登录后生成 JWT Token，用户访问受保护接口时需要携带 Token 进行身份验证。
+
+Qdrant
+Qdrant 是一个向量数据库。
+本项目使用 Qdrant 保存知识文本的向量表示，并根据用户问题的向量进行语义相似度检索。
+
+Embedding
+Embedding 用于把文本转换成向量。
+本项目使用 BAAI/bge-small-zh-v1.5 模型将知识库内容和用户问题转换成 512 维向量。
+
+Docker
+Docker 用于运行本项目依赖的基础服务。
+目前 Redis 和 Qdrant 都运行在 Docker 容器中，便于启动、停止和管理。

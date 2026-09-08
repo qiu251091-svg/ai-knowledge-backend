@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+
+.venv/
+.env
+
+.idea/
+.pytest_cache/
+
+app.db
+
+# User uploaded documents
+data/uploads/*
+!data/uploads/.gitkeep
